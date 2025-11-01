@@ -13,6 +13,9 @@ import com.tradewise.api.dto.AddAssetRequest;
 import com.tradewise.api.model.PortfolioAsset;
 import com.tradewise.api.repository.PortfolioAssetRepository;
 import java.util.UUID;
+import com.tradewise.api.dto.response.PortfolioAssetResponse; // <-- ADD
+import java.util.List; // <-- ADD
+import java.util.stream.Collectors; // <-- ADD
 
 @Service
 public class PortfolioService {
@@ -92,5 +95,36 @@ public class PortfolioService {
 
         // 5. Save the asset to the database
         return portfolioAssetRepository.save(newAsset);
+    }
+
+    @Transactional(readOnly = true) // Optimization for GET requests
+    public List<PortfolioAssetResponse> getAssetsForPortfolio(UUID portfolioId, String userEmail) {
+
+        // 1. Find the portfolio
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found with id: " + portfolioId));
+
+        // 2. Find the user
+        User currentUser = userService.findByEmail(userEmail);
+
+        // 3. --- CRITICAL SECURITY CHECK ---
+        if (!portfolio.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Access Denied: You do not own this portfolio.");
+        }
+
+        // 4. Fetch the assets
+        List<PortfolioAsset> assets = portfolioAssetRepository.findAllByPortfolioId(portfolioId);
+
+        // 5. Map to DTOs
+        return assets.stream()
+                .map(asset -> new PortfolioAssetResponse(
+                        asset.getId(),
+                        asset.getSymbol(),
+                        asset.getQuantity(),
+                        asset.getPurchasePrice(),
+                        asset.getPurchaseDate(),
+                        asset.getPortfolio().getId()
+                ))
+                .collect(Collectors.toList());
     }
 }

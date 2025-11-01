@@ -16,6 +16,7 @@ import com.tradewise.api.dto.response.PortfolioAssetResponse;
 import com.tradewise.api.model.PortfolioAsset;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -88,5 +89,17 @@ public class PortfolioController {
         );
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{portfolioId}/assets")
+    public ResponseEntity<List<PortfolioAssetResponse>> getAssetsForPortfolio(
+            @PathVariable UUID portfolioId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userEmail = userDetails.getUsername();
+
+        List<PortfolioAssetResponse> response = portfolioService.getAssetsForPortfolio(portfolioId, userEmail);
+
+        return ResponseEntity.ok(response);
     }
 }
