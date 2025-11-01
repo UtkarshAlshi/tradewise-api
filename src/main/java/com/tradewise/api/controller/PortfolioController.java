@@ -17,6 +17,7 @@ import com.tradewise.api.model.PortfolioAsset;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.UUID;
 import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -101,5 +102,19 @@ public class PortfolioController {
         List<PortfolioAssetResponse> response = portfolioService.getAssetsForPortfolio(portfolioId, userEmail);
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{portfolioId}/assets/{assetId}")
+    public ResponseEntity<Void> deleteAsset(
+            @PathVariable UUID portfolioId,
+            @PathVariable UUID assetId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userEmail = userDetails.getUsername();
+
+        portfolioService.deleteAssetFromPortfolio(portfolioId, assetId, userEmail);
+
+        // A 204 No Content response is standard for a successful DELETE
+        return ResponseEntity.noContent().build();
     }
 }

@@ -127,4 +127,32 @@ public class PortfolioService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteAssetFromPortfolio(UUID portfolioId, UUID assetId, String userEmail) {
+
+        // 1. Find the user
+        User currentUser = userService.findByEmail(userEmail);
+
+        // 2. Find the portfolio
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found with id: " + portfolioId));
+
+        // 3. Find the asset
+        PortfolioAsset asset = portfolioAssetRepository.findById(assetId)
+                .orElseThrow(() -> new RuntimeException("Asset not found with id: " + assetId));
+
+        // 4. --- CRITICAL SECURITY CHECK ---
+        if (!portfolio.getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Access Denied: You do not own this portfolio.");
+        }
+
+        // 5. --- CRITICAL INTEGRITY CHECK ---
+        if (!asset.getPortfolio().getId().equals(portfolioId)) {
+            throw new RuntimeException("Access Denied: Asset does not belong to this portfolio.");
+        }
+
+        // 6. Both checks passed, delete the asset
+        portfolioAssetRepository.delete(asset);
+    }
 }
