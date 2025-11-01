@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import java.util.UUID;
 import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import com.tradewise.api.dto.response.PortfolioAnalyticsResponse; // <-- ADD
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -116,5 +117,17 @@ public class PortfolioController {
 
         // A 204 No Content response is standard for a successful DELETE
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{portfolioId}/analytics")
+    public ResponseEntity<PortfolioAnalyticsResponse> getPortfolioAnalytics(
+            @PathVariable UUID portfolioId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userEmail = userDetails.getUsername();
+
+        PortfolioAnalyticsResponse response = portfolioService.getPortfolioAnalytics(portfolioId, userEmail);
+
+        return ResponseEntity.ok(response);
     }
 }
