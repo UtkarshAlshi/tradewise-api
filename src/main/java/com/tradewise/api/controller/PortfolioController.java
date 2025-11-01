@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -45,4 +46,18 @@ public class PortfolioController {
     }
 
     // We will add endpoints here for GET, PUT, and DELETE
+
+    @GetMapping
+    public ResponseEntity<List<PortfolioResponse>> getPortfolios(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        // Get the email of the logged-in user
+        String userEmail = userDetails.getUsername();
+
+        // Call the service to get the list
+        List<PortfolioResponse> portfolios = portfolioService.getPortfoliosByUser(userEmail);
+
+        // Return the list with a 200 OK
+        return ResponseEntity.ok(portfolios);
+    }
 }

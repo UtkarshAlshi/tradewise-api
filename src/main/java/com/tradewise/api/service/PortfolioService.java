@@ -6,6 +6,9 @@ import com.tradewise.api.model.User;
 import com.tradewise.api.repository.PortfolioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tradewise.api.dto.response.PortfolioResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PortfolioService {
@@ -32,5 +35,25 @@ public class PortfolioService {
 
         // 3. Save it to the database
         return portfolioRepository.save(portfolio);
+    }
+
+    @Transactional(readOnly = true) // readOnly = true is an optimization for GET operations
+    public List<PortfolioResponse> getPortfoliosByUser(String userEmail) {
+        // 1. Find the user
+        User currentUser = userService.findByEmail(userEmail);
+
+        // 2. Find all portfolios for that user
+        List<Portfolio> portfolios = portfolioRepository.findByUserId(currentUser.getId());
+
+        // 3. Map the list of Portfolio entities to a list of PortfolioResponse DTOs
+        return portfolios.stream()
+                .map(portfolio -> new PortfolioResponse(
+                        portfolio.getId(),
+                        portfolio.getName(),
+                        portfolio.getDescription(),
+                        portfolio.getCreatedAt(),
+                        portfolio.getUser().getId()
+                ))
+                .collect(Collectors.toList());
     }
 }
