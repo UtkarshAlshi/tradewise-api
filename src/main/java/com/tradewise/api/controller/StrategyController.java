@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000") // Allow frontend access
 @RestController
@@ -43,4 +44,14 @@ public class StrategyController {
     }
 
     // We will add GET endpoints here next
+
+    @GetMapping
+    public ResponseEntity<List<StrategyResponse>> getStrategies(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userEmail = userDetails.getUsername();
+        List<StrategyResponse> strategies = strategyService.getStrategiesByUser(userEmail);
+
+        return ResponseEntity.ok(strategies);
+    }
 }

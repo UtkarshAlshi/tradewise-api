@@ -7,6 +7,9 @@ import com.tradewise.api.model.*;
 import com.tradewise.api.repository.StrategyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tradewise.api.dto.response.StrategyResponse;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,5 +67,25 @@ public class StrategyService {
 
         // 4. Save the parent. CascadeType.ALL will save all rules and conditions.
         return strategyRepository.save(strategy);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StrategyResponse> getStrategiesByUser(String userEmail) {
+        // 1. Find the user
+        User user = userService.findByEmail(userEmail);
+
+        // 2. Find all strategies for that user
+        List<Strategy> strategies = strategyRepository.findByUserId(user.getId());
+
+        // 3. Map to our response DTO
+        return strategies.stream()
+                .map(strategy -> new StrategyResponse(
+                        strategy.getId(),
+                        strategy.getName(),
+                        strategy.getDescription(),
+                        strategy.getCreatedAt(),
+                        strategy.getUser().getId()
+                ))
+                .collect(Collectors.toList());
     }
 }
