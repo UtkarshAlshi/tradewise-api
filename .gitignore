@@ -1,0 +1,36 @@
+# =======================================
+# Spring Boot / Maven
+# =======================================
+/target/
+*.jar
+*.war
+.mvn/
+
+# =======================================
+# IDE Files (IntelliJ, VS Code, Eclipse)
+# =======================================
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# =======================================
+# Operating System Files
+# =======================================
+.DS_Store
+Thumbs.db
+
+# =======================================
+# Log Files
+# =======================================
+logs/
+*.log
+
+# =======================================
+# Secrets
+# =======================================
+# Although our secret is in application.properties,
+# this is good practice for any future .env files
+*.env
