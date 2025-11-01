@@ -11,6 +11,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.tradewise.api.dto.AddAssetRequest;
+import com.tradewise.api.dto.response.PortfolioAssetResponse;
+import com.tradewise.api.model.PortfolioAsset;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -59,5 +64,29 @@ public class PortfolioController {
 
         // Return the list with a 200 OK
         return ResponseEntity.ok(portfolios);
+    }
+
+    @PostMapping("/{portfolioId}/assets")
+    public ResponseEntity<PortfolioAssetResponse> addAssetToPortfolio(
+            @PathVariable UUID portfolioId,
+            @Valid @RequestBody AddAssetRequest request,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String userEmail = userDetails.getUsername();
+
+        // Call the service
+        PortfolioAsset savedAsset = portfolioService.addAssetToPortfolio(portfolioId, request, userEmail);
+
+        // Map to the response DTO
+        PortfolioAssetResponse response = new PortfolioAssetResponse(
+                savedAsset.getId(),
+                savedAsset.getSymbol(),
+                savedAsset.getQuantity(),
+                savedAsset.getPurchasePrice(),
+                savedAsset.getPurchaseDate(),
+                savedAsset.getPortfolio().getId()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
