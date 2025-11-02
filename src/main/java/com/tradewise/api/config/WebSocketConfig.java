@@ -12,12 +12,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 1. Enable a simple in-memory message broker
-        // 2. Define the topic prefix. Clients will subscribe to /topic/prices
-        config.enableSimpleBroker("/topic");
+        // Defines topics clients subscribe to
+        config.enableSimpleBroker("/topic", "/user"); // <-- ADD "/user"
 
-        // 3. Define the application prefix for messages bound for the server
+        // Defines prefix for messages from client to server
         config.setApplicationDestinationPrefixes("/app");
+
+        // Defines prefix for user-specific messages
+        config.setUserDestinationPrefix("/user"); // <-- ADD THIS
     }
 
     @Override

@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tradewise.api.dto.finnhub.FinnhubMessage;
 import com.tradewise.api.dto.finnhub.FinnhubTrade;
 import com.tradewise.api.dto.response.StockPriceUpdate;
+import com.tradewise.api.event.PriceUpdateEvent; // <-- 1. IMPORT
 import jakarta.annotation.PostConstruct;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher; // <-- 1. IMPORT
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +42,16 @@ public class MarketDataBroker {
     private final SimpMessagingTemplate messagingTemplate;
     // Jackson's tool for parsing JSON
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher; // <-- 1. ADD THIS
     private WebSocketClient webSocketClient;
 
-    public MarketDataBroker(SimpMessagingTemplate messagingTemplate, ObjectMapper objectMapper) {
+    // --- 2. UPDATE CONSTRUCTOR ---
+    public MarketDataBroker(SimpMessagingTemplate messagingTemplate,
+                            ObjectMapper objectMapper,
+                            ApplicationEventPublisher eventPublisher) { // <-- ADD THIS
         this.messagingTemplate = messagingTemplate;
         this.objectMapper = objectMapper;
+        this.eventPublisher = eventPublisher; // <-- ADD THIS
     }
 
     /**
@@ -118,5 +125,9 @@ public class MarketDataBroker {
 
         logger.debug("Broadcasting update: " + topic + " - Price: " + price);
         messagingTemplate.convertAndSend(topic, update);
+
+        // --- 3. PUBLISH THE INTERNAL EVENT ---
+        // This sends the price to our *internal* services, like the NotificationService
+        eventPublisher.publishEvent(new PriceUpdateEvent(this, symbol, price));
     }
 }
