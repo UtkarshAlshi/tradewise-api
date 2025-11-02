@@ -4,6 +4,7 @@ import com.tradewise.api.security.JwtAuthFilter;
 import com.tradewise.api.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // Make sure this is here
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,7 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.http.HttpMethod; // <-- ADD THIS IMPORT
+import org.springframework.web.cors.CorsConfiguration; // <-- ADD THIS IMPORT
+import org.springframework.web.cors.CorsConfigurationSource; // <-- ADD THIS IMPORT
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // <-- ADD THIS IMPORT
+
+import java.util.List; // <-- ADD THIS IMPORT
 
 @Configuration
 @EnableWebSecurity
@@ -41,11 +46,18 @@ public class SecurityConfig {
                 // 1. Disable CSRF (Cross-Site Request Forgery)
                 .csrf(AbstractHttpConfigurer::disable)
 
+                // *** ADD THIS CORS CONFIGURATION ***
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
                 // 2. Define endpoint authorization
                 .authorizeHttpRequests(auth -> auth
                         // 2a. These endpoints are public
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS).permitAll() // <-- ADD THIS LINE
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
+
+                        // *** THIS IS THE NEW LINE FOR WEBSOCKETS ***
+                        .requestMatchers("/ws/**").permitAll()
+
                         // 2b. All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
@@ -62,6 +74,19 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // *** ADD THIS BEAN FOR CORS ***
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
