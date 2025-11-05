@@ -58,35 +58,25 @@ public class NotificationService {
 
         // 3. (Simulation) Assume the strategy triggered. Create and send notifications.
         for (ActiveStrategy monitor : monitors) {
+            // Always trigger for now
+            logger.info("TEST TRIGGER: Strategy {} for symbol {} for user {}",
+                    monitor.getStrategy().getName(), symbol, monitor.getUser().getEmail());
 
-            // --- (Simulation) Let's just trigger randomly 1% of the time ---
-            if (Math.random() < 0.01) {
-                logger.info("SIMULATED TRIGGER: Strategy {} for symbol {} for user {}",
-                        monitor.getStrategy().getName(), symbol, monitor.getUser().getEmail());
+            String message = String.format(
+                    "TEST notification — Strategy '%s' triggered for %s at price $%.2f",
+                    monitor.getStrategy().getName(),
+                    symbol,
+                    event.getPrice()
+            );
 
-                // 4. Create the notification message
-                String message = String.format(
-                        "Strategy Triggered: '%s' for %s at price $%.2f",
-                        monitor.getStrategy().getName(),
-                        symbol,
-                        event.getPrice()
-                );
+            Notification notification = new Notification();
+            notification.setUser(monitor.getUser());
+            notification.setMessage(message);
+            notification.setRead(false);
+            Notification savedNotification = notificationRepository.save(notification);
 
-                // 5. Save notification to the database
-                Notification notification = new Notification();
-                notification.setUser(monitor.getUser());
-                notification.setMessage(message);
-                notification.setRead(false);
-                Notification savedNotification = notificationRepository.save(notification);
-
-                // 6. Send the notification to the *specific user*
-                //    The topic is "/user/queue/notifications". Spring maps this.
-                messagingTemplate.convertAndSendToUser(
-                        monitor.getUser().getEmail(), // Spring finds the user's session
-                        "/queue/notifications",    // The private destination
-                        savedNotification              // The payload
-                );
-            }
+            // For now, broadcast globally
+            messagingTemplate.convertAndSend("/topic/notifications", savedNotification);
         }
     }
-}
+    }
