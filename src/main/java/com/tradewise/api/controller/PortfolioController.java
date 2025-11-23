@@ -20,7 +20,6 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import com.tradewise.api.dto.response.PortfolioAnalyticsResponse; // <-- ADD
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/portfolios")
 public class PortfolioController {

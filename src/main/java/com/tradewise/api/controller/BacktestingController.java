@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal; // <-- ADD
 import org.springframework.security.core.userdetails.UserDetails; // <-- ADD
 
-@CrossOrigin(origins = "http://localhost:3000") // Allow frontend access
 @RestController
 @RequestMapping("/api/backtest")
 public class BacktestingController {

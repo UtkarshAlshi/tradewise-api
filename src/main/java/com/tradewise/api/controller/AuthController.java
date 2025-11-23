@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import com.tradewise.api.dto.LoginRequest;
 import com.tradewise.api.dto.response.LoginResponse;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
