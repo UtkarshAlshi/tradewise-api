@@ -35,7 +35,7 @@ public class User {
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    // A user can have many portfolios
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<Portfolio> portfolios;
+    // The portfolios relationship has been moved to the portfolio-service
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // private Set<Portfolio> portfolios;
 }

@@ -1,9 +1,9 @@
 package com.tradewise.api.service;
 
 import com.tradewise.api.dto.response.LeaderboardEntryResponse;
-import com.tradewise.api.dto.response.PortfolioAnalyticsResponse;
-import com.tradewise.api.model.Portfolio;
-import com.tradewise.api.repository.PortfolioRepository;
+// import com.tradewise.api.dto.response.PortfolioAnalyticsResponse; // No longer needed directly here
+// import com.tradewise.api.model.Portfolio; // No longer needed directly here
+// import com.tradewise.api.repository.PortfolioRepository; // No longer needed directly here
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -15,15 +15,21 @@ import java.util.stream.Collectors;
 @Service
 public class LeaderboardService {
 
-    private final PortfolioRepository portfolioRepository;
-    private final PortfolioService portfolioService;
+    // These dependencies have been moved to portfolio-service
+    // private final PortfolioRepository portfolioRepository;
+    // private final PortfolioService portfolioService;
 
-    public LeaderboardService(PortfolioRepository portfolioRepository, PortfolioService portfolioService) {
-        this.portfolioRepository = portfolioRepository;
-        this.portfolioService = portfolioService;
-    }
+    // public LeaderboardService(PortfolioRepository portfolioRepository, PortfolioService portfolioService) {
+    //     this.portfolioRepository = portfolioRepository;
+    //     this.portfolioService = portfolioService;
+    // }
 
     public List<LeaderboardEntryResponse> getLeaderboard() {
+        // This method's logic needs to be re-implemented to call the portfolio-service
+        // via a REST client. For now, we return an empty list to allow compilation.
+        return new ArrayList<>();
+
+        /*
         // 1. Fetch all portfolios (this includes user data)
         List<Portfolio> allPortfolios = portfolioRepository.findAll();
 
@@ -67,5 +73,6 @@ public class LeaderboardService {
         }
 
         return topEntries;
+        */
     }
 }

@@ -59,18 +59,19 @@ public class NotificationService {
         // 3. (Simulation) Assume the strategy triggered. Create and send notifications.
         for (ActiveStrategy monitor : monitors) {
             // Always trigger for now
-            logger.info("TEST TRIGGER: Strategy {} for symbol {} for user {}",
-                    monitor.getStrategy().getName(), symbol, monitor.getUser().getEmail());
+            // logger.info("TEST TRIGGER: Strategy {} for symbol {} for user {}",
+            //         monitor.getStrategy().getName(), symbol, monitor.getUser().getEmail()); // Removed direct access
 
             String message = String.format(
                     "TEST notification — Strategy '%s' triggered for %s at price $%.2f",
-                    monitor.getStrategy().getName(),
+                    "Simulated Strategy", // Placeholder for strategy name
                     symbol,
                     event.getPrice()
             );
 
             Notification notification = new Notification();
-            notification.setUser(monitor.getUser());
+            // notification.setUser(monitor.getUser()); // Removed direct User object
+            notification.setUserEmail(monitor.getUserEmail()); // Use user email from ActiveStrategy
             notification.setMessage(message);
             notification.setRead(false);
             Notification savedNotification = notificationRepository.save(notification);
@@ -79,4 +80,4 @@ public class NotificationService {
             messagingTemplate.convertAndSend("/topic/notifications", savedNotification);
         }
     }
-    }
+}

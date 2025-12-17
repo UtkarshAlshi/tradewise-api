@@ -16,17 +16,20 @@ public class ActiveStrategy {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "strategy_id", nullable = false)
-    private Strategy strategy;
+    @Column(name = "strategy_id", nullable = false)
+    private UUID strategyId;
 
     @Column(nullable = false)
     private String symbol;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
+
+    // Manually added getter for userEmail
+    public String getUserEmail() {
+        return userEmail;
+    }
 }

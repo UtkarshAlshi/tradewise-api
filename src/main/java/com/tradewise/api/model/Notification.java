@@ -18,9 +18,8 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
 
     @Column(nullable = false, length = 500)
     private String message;
@@ -32,5 +31,12 @@ public class Notification {
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
 
-    // We can add more fields later, like a link to the strategy or symbol
+    // Manually added setters
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setRead(boolean isRead) {
+        this.isRead = isRead;
+    }
 }
